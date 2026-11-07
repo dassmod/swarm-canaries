@@ -47,6 +47,7 @@ cp .env.example .env   # then put your Adaption key in .env
 | DuckDB + pandas | Querying run logs |
 | matplotlib | Charts for the report |
 | Claude Code | Each of us, started in this folder; it reads `CLAUDE.md` |
+| ruff | Formatting and lint. Run `ruff format .` and `ruff check .` before every commit (see `CLAUDE.md`) |
 | Git + private GitHub repo | Shared history; keep private until organizers say otherwise |
 | Apart report template (Google Docs, export to PDF) | The submission |
 
