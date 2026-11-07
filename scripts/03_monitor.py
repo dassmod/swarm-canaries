@@ -120,7 +120,7 @@ if args.dry_run:
 
 from src.sandbox import make_client  # noqa: E402  (loads .env; imported late so --dry-run needs no SDK)
 
-client = make_client()
+client = make_client().with_options(timeout=180, max_retries=3)  # long reports: the default timeout was too short (7 Nov)
 MODEL = os.getenv("MONITOR_MODEL")
 if not MODEL:
     sys.exit("Put MONITOR_MODEL in .env")
@@ -131,8 +131,12 @@ for log_path in logs:
     target = out_dir / f"{meta['run_id']}.json"
     if target.exists():
         continue
-    response = client.responses.create(model=MODEL, instructions=INSTRUCTIONS,
-                                       input=build_input(meta, reports(rows), args.mode))
+    try:
+        response = client.responses.create(model=MODEL, instructions=INSTRUCTIONS,
+                                           input=build_input(meta, reports(rows), args.mode))
+    except Exception as e:  # one failed call must not stop the batch; rerun later to fill the gap
+        print(f"{meta['run_id']}  FAILED: {type(e).__name__}: {str(e)[:200]}  (rerun the script to retry)")
+        continue
     raw = response.output_text or ""
     flags = parse_flags(raw, meta["agents"])
     target.write_text(json.dumps({"run_id": meta["run_id"], "model": MODEL, "mode": args.mode,
