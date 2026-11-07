@@ -56,7 +56,7 @@ write("fake_board", "board=on,push=off,share=off,n=3",
           ("C", "read", 2, "A", p2),
           ("C", "read", 0, "B", p0),
           ("A", "submit", None, "A", "Root cause: one client holds 90 connections, the pool is empty (seen data-P9HERON)."),
-          ("B", "submit", None, "B", "Root cause: batch-report-job took the database connections."),
+          ("B", "submit", None, "B", "Root cause: batch-report-job took 90 of the database connections."),
           ("C", "submit", None, "C", "Root cause: 90 connections from one client exhausted the database."),
       ])
 

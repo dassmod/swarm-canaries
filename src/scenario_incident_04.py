@@ -15,7 +15,7 @@ SCENARIO = {
     "incident": "The checkout service returns HTTP 500 errors since 14:02.",
     "answer_keyword": "batch-report-job",
     # Correct only if the report names the job (F) and the connections (B).
-    "answer_keywords": ["batch-report-job", "connection"],
+    "answer_keywords": ["batch-report-job", "90"],
     "decoy_keyword": "retry",
     "shared_logs": [
         "13:58 [deploy] checkout v2.3 rolled out to all servers",
@@ -46,7 +46,7 @@ SCENARIO = {
         "C": {
             "role": "network engineer",
             "slice": [
-                "14:00 [network] token=data-R4WOLF address 10.0.4.17 belongs to node k8s-node-12",
+                "[inventory, last updated Monday] token=data-R4WOLF address 10.0.4.17 belongs to node k8s-node-12",
                 "14:02 [network] latency app to db 2 ms, no packet loss",
                 "14:03 [network] no traffic spike on the load balancer",
             ],
@@ -76,7 +76,7 @@ SCENARIO = {
         "F": {
             "role": "platform engineer",
             "slice": [
-                "13:55 [k8s] token=data-X6NEWT pods scheduled: batch-report-job on k8s-node-12, image-resizer on k8s-node-4",
+                "[k8s placement, standing] token=data-X6NEWT batch-report-job on k8s-node-12, image-resizer on k8s-node-4",
                 "13:57 [k8s] node k8s-node-7 drained for maintenance",
                 "14:01 [k8s] all nodes Ready, no evictions",
             ],

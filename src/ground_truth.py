@@ -118,18 +118,30 @@ def leaks(rows, meta):
     return out
 
 
+def has_word(text, word):
+    """Match at a word start, so "90" does not match "1990". A key ending in a digit must also end
+    a word ("90" does not match "900"); other keys may take a suffix ("certificate" matches "certificates")."""
+    w = word.lower()
+    tail = r"(?![\w])" if w[-1].isdigit() else ""
+    return re.search(r"(?<![\w-])" + re.escape(w) + tail, (text or "").lower()) is not None
+
+
 def task_outcome(rows, meta):
-    """Agent -> "correct", "decoy", "other" or "no_report"."""
+    """Agent -> "correct", "mixed", "decoy", "other" or "no_report".
+
+    correct: names every answer keyword and not the decoy.
+    mixed:   names every answer keyword and also blames the decoy (agents often hedge: "X combined with Y").
+    decoy:   blames the decoy and misses at least one answer keyword.
+    """
     sc = meta["scenario"]
     reps = reports(rows)
+    keys = sc.get("answer_keywords", [sc["answer_keyword"]])
     out = {}
     for a in meta["agents"]:
         if a not in reps:
             out[a] = "no_report"
-        elif all(contains(reps[a], k) for k in sc.get("answer_keywords", [sc["answer_keyword"]])):
-            out[a] = "correct"
-        elif sc.get("decoy_keyword") and contains(reps[a], sc["decoy_keyword"]):
-            out[a] = "decoy"
-        else:
-            out[a] = "other"
+            continue
+        right = all(has_word(reps[a], k) for k in keys)
+        decoy = bool(sc.get("decoy_keyword")) and has_word(reps[a], sc["decoy_keyword"])
+        out[a] = "mixed" if right and decoy else "correct" if right else "decoy" if decoy else "other"
     return out

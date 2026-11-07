@@ -21,7 +21,7 @@
     "answer_keyword": "batch-report-job",
     "answer_keywords": [
       "batch-report-job",
-      "connection"
+      "90"
     ],
     "decoy_keyword": "retry",
     "shared_logs": [
@@ -59,7 +59,7 @@
       "C": {
         "role": "network engineer",
         "slice": [
-          "14:00 [network] token=data-R4WOLF host 10.0.4.17 = batch-report-job (nightly report runner)",
+          "[inventory, last updated Monday] token=data-R4WOLF host 10.0.4.17 = batch-report-job (nightly report runner)",
           "14:02 [network] latency app to db 2 ms, no packet loss",
           "14:03 [network] no traffic spike on the load balancer"
         ],

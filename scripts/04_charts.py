@@ -32,7 +32,7 @@ out = Path(args.out)
 out.mkdir(parents=True, exist_ok=True)
 
 # Validated reference palette (dataviz skill, light mode): slot 1 blue, slot 2 orange.
-COLORS = {"canary": "#2a78d6", "llm_monitor": "#eb6834", "llm_monitor_informed": "#1baf7a"}
+COLORS = {"canary": "#2a78d6", "llm_monitor": "#eb6834", "llm_monitor_redacted": "#1baf7a", "llm_monitor_informed": "#eda100"}
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 plt.rcParams.update({"font.size": 10, "axes.edgecolor": GRID, "axes.labelcolor": INK2,
                      "xtick.color": INK2, "ytick.color": INK2, "axes.titlecolor": INK})

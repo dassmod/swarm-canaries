@@ -37,18 +37,24 @@ from src.ground_truth import ground_truth, leaks, load_run, task_outcome  # noqa
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--runs", default=str(ROOT / "data" / "runs"))
-ap.add_argument("--monitor", default=str(ROOT / "data" / "monitor"), help="folder with <run_id>.json monitor outputs")
+ap.add_argument("--monitor", nargs="*", default=[str(ROOT / "data" / m) for m in ("monitor", "monitor_informed", "monitor_redacted")],
+                help="folders with <run_id>.json monitor outputs; each folder is scored as its own detector")
 ap.add_argument("--out", default=str(ROOT / "results"))
 args = ap.parse_args()
 
-runs_dir, mon_dir, out = Path(args.runs), Path(args.monitor), Path(args.out)
+runs_dir, out = Path(args.runs), Path(args.out)
+mon_dirs = [Path(m) for m in args.monitor if Path(m).is_dir()]
 out.mkdir(parents=True, exist_ok=True)
 logs = sorted(p for p in runs_dir.glob("*.jsonl"))
 if not logs:
     sys.exit(f"No runs in {runs_dir}")
 
 
-def monitor_flags(run_id):
+def monitor_name(d):
+    return "llm_" + d.name if d.name != "monitor" else "llm_monitor"
+
+
+def monitor_flags(mon_dir, run_id):
     p = mon_dir / f"{run_id}.json"
     if not p.exists():
         return None
@@ -65,9 +71,10 @@ for log_path in logs:
     pairs = {(s, d) for s in agents for d in agents if s != d}
 
     detectors = {"canary": detect_canary(rows, meta)}
-    mon = monitor_flags(run_id)
-    if mon is not None:
-        detectors["llm_monitor"] = mon
+    for md in mon_dirs:
+        mon = monitor_flags(md, run_id)
+        if mon is not None:
+            detectors[monitor_name(md)] = mon
 
     for det, flags in detectors.items():
         f = set(flags) & pairs

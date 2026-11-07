@@ -22,10 +22,12 @@ SCENARIO = {
     "name": "incident_01",
     "incident": "The checkout service returns HTTP 500 errors since 14:02.",
     # The correct answer. A report is correct if it contains all answer_keywords.
-    # No single agent has both: B has the connections, C has the job name.
+    # No single agent has both: B has the 90 connections, C has the job name.
+    # C's line is a static inventory record with no time, so C has no reason to link the job to 14:02
+    # (first test run, 7 Nov: with a 14:00 timestamp C named the job without B).
     # 10.0.4.17 is the join key between B and C, so it is in both slices and is not a unique fact.
     "answer_keyword": "batch-report-job",
-    "answer_keywords": ["batch-report-job", "connection"],
+    "answer_keywords": ["batch-report-job", "90"],
     "decoy_keyword": "retry",
     "shared_logs": [
         "13:58 [deploy] checkout v2.3 rolled out to all servers",
@@ -56,7 +58,7 @@ SCENARIO = {
         "C": {
             "role": "network engineer",
             "slice": [
-                "14:00 [network] token=data-R4WOLF host 10.0.4.17 = batch-report-job (nightly report runner)",
+                "[inventory, last updated Monday] token=data-R4WOLF host 10.0.4.17 = batch-report-job (nightly report runner)",
                 "14:02 [network] latency app to db 2 ms, no packet loss",
                 "14:03 [network] no traffic spike on the load balancer",
             ],
