@@ -36,6 +36,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src.detect_canary import detect as detect_canary  # noqa: E402
+from src.detect_fact_canary import detect as detect_fact_canary  # noqa: E402
 from src.ground_truth import ground_truth, leaks, load_run, task_outcome  # noqa: E402
 
 ap = argparse.ArgumentParser()
@@ -77,7 +78,7 @@ for log_path in logs:
     real_read, real_used = set(gt["read"]), set(gt["used"])
     pairs = {(s, d) for s in agents for d in agents if s != d}
 
-    detectors = {"canary": detect_canary(rows, meta)}
+    detectors = {"canary": detect_canary(rows, meta), "fact_canary": detect_fact_canary(rows, meta)}
     for md in mon_dirs:
         mon = monitor_flags(md, run_id)
         if mon is not None:

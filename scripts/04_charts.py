@@ -37,6 +37,7 @@ out.mkdir(parents=True, exist_ok=True)
 # Validated reference palette (dataviz skill, light mode): slot 1 blue, slot 2 orange.
 COLORS = {
     "canary": "#2a78d6",
+    "fact_canary": "#e87ba4",
     "llm_monitor": "#eb6834",
     "llm_monitor_redacted": "#1baf7a",
     "llm_monitor_informed": "#eda100",
