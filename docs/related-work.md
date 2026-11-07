@@ -1,6 +1,6 @@
 # Related work
 
-From Partner's quick search on 7 Nov (not a full review). Links to add as each paper is opened.
+From Nikita's quick search on 7 Nov (not a full review). Links to add as each paper is opened.
 
 ## Closest work
 

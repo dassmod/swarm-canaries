@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Research code for Apart Research's Swarm Alignment Hackathon: canary tokens as proof of information transfer between agents. Two people use this repo: Das and Partner. Read `README.md`, `PLAN.md` and `docs/design.md` before changing code.
+Research code for Apart Research's Swarm Alignment Hackathon: canary tokens as proof of information transfer between agents. Two people use this repo: Dastan and Nikita. Read `README.md`, `PLAN.md` and `docs/design.md` before changing code.
 
 ## Rules for everyone
 
@@ -12,10 +12,10 @@ Research code for Apart Research's Swarm Alignment Hackathon: canary tokens as p
 - Record decisions and findings in `docs/log.md`, newest first.
 - Never use em-dashes or en-dashes in prose.
 
-## When working with Das
+## When working with Dastan
 
-- Das is learning this field and this code while building it. Build first, then name the concept on what just happened.
-- Before explaining a result, ask Das to say what he sees in it, wrong parts included. Then correct the gap.
+- Dastan is learning this field and this code while building it. Build first, then name the concept on what just happened.
+- Before explaining a result, ask Dastan to say what he sees in it, wrong parts included. Then correct the gap.
 - Explanations: short sentences, one idea each, bold anchor lines, a table for any trace. Full depth, simple words.
-- When Das does not follow a piece of code: explain the primitive it stands on directly, show one input giving two different results side by side, then hand his own code back for him to walk. Never restate a sentence that did not land; go one layer down.
+- When Dastan does not follow a piece of code: explain the primitive it stands on directly, show one input giving two different results side by side, then hand his own code back for him to walk. Never restate a sentence that did not land; go one layer down.
 - Do not do the whole task silently. Propose the next step, say why, then do it.

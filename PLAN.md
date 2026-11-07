@@ -2,8 +2,8 @@
 
 Two people, Saturday 7 to Monday 9 Nov. Times are Bishkek (UTC+6). Roles can swap any time; write it in `docs/log.md` when they do.
 
-- **Das: sandbox and runs.** Agents, board, task, conditions, running batches.
-- **Partner: detectors and analysis.** Canary detector, ground-truth metrics, LLM monitor, charts.
+- **Dastan: sandbox and runs.** Agents, board, task, conditions, running batches.
+- **Nikita: detectors and analysis.** Canary detector, ground-truth metrics, LLM monitor, charts.
 - **Both: report.**
 
 ## Priorities
@@ -16,7 +16,7 @@ Cut from the right when time runs short.
 
 ## Saturday
 
-| Block | Das | Partner |
+| Block | Dastan | Nikita |
 |---|---|---|
 | **0. Kickoff (30 min, together)** | Clone repo, `.env` with Adaption key | Clone repo, `.env` |
 | | **Decide together:** the agent task, canary placement, the exact ground-truth definition. Options in `docs/design.md`. Write the decision in `docs/log.md`. | |
@@ -30,7 +30,7 @@ Optional talk: Justin Shenk, "Modeling Agent Swarms: A Field Guide", Saturday 19
 
 ## Sunday
 
-| Block | Das | Partner |
+| Block | Dastan | Nikita |
 |---|---|---|
 | **Morning** | Batch runs: repeats per must-condition (check credits first) | Metrics per run, aggregate table, first charts |
 | **Midday** | Should-conditions (6 agents, canary placement) | LLM monitor on all runs; compare with canaries |

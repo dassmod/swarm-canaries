@@ -2,7 +2,7 @@
 
 Can unique marked facts ("canaries") prove that AI agents passed information to each other, when an observer sees only what each agent reports?
 
-Entry for Apart Research's [Swarm Alignment Hackathon](https://apartresearch.com/sprints/swarm-alignment-2026), 6 to 9 Nov 2026. Team: Das and Partner.
+Entry for Apart Research's [Swarm Alignment Hackathon](https://apartresearch.com/sprints/swarm-alignment-2026), 6 to 9 Nov 2026. Team: Dastan and Nikita.
 
 **Deadline:** Monday 9 Nov, 17:59 Bishkek (Sunday 23:59 AoE). Resubmit with the same title to replace a draft.
 
