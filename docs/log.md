@@ -4,6 +4,7 @@ Decisions and findings, newest first. One line each, with who wrote it.
 
 | Date | Who | Entry |
 |---|---|---|
+| 2026-11-07 | Nikita | Scenarios 2 (data pipeline, timezone), 3 (payments, expired certificate) and 4 (scenario 1 with six engineers, for 3 vs 6) added. Answers now need all `answer_keywords`, so no single agent can name the answer alone; `tests/check_scenarios.py` checks this for every scenario. Join keys (an address both halves share) are not unique facts. `01_run_sandbox.py` still loads only scenario 1: Dastan to add a `--scenario` flag |
 | 2026-11-07 | Nikita | Detector side built and tested on hand-made fake runs (`tests/`, all checks pass): `src/ground_truth.py` (read and used pairs, leaks, task outcome), `src/detect_canary.py`, `scripts/02_metrics.py` (tables in `results/`), `scripts/03_monitor.py` (LLM monitor, blind and informed modes), `scripts/04_charts.py`. No real runs scored yet |
 | 2026-11-07 | Nikita | Ground truth detail: the source of a post is its author plus every agent whose unique fact or data token is inside it, so a retold fact still counts as coming from its owner (a canary names the owner, not the author) |
 | 2026-11-07 | Nikita | Scenario 1 replaced: the answer (batch-report-job) now needs two agents (B sees client 10.0.4.17 with 90 connections, C sees that 10.0.4.17 is batch-report-job). Unique facts are ids and numbers so a substring match survives retelling. Added `decoy_keyword` to score decoy answers |

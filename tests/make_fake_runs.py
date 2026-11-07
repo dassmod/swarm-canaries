@@ -4,7 +4,7 @@ Run:  .venv/bin/python tests/make_fake_runs.py   (writes tests/fixtures/)
 Then: .venv/bin/python scripts/02_metrics.py --runs tests/fixtures --monitor tests/fixtures/monitor --out tests/out
 
 fake_board (board on), what happens and what the scripts must find:
-  1. B posts its data line (token data-P9HERON, fact 10.0.4.17). A reads it.
+  1. B posts its data line (token data-P9HERON, fact 90 connections). A reads it.
      A's report has the fact AND the token.       -> B->A used, canary catches it.
   2. C posts "10.0.4.17 is batch-report-job" without its token. B reads it.
      B's report has batch-report-job, no token.   -> C->B used, canary misses it.
@@ -55,7 +55,7 @@ write("fake_board", "board=on,push=off,share=off,n=3",
           ("B", "read", 1, "C", p1),
           ("C", "read", 2, "A", p2),
           ("C", "read", 0, "B", p0),
-          ("A", "submit", None, "A", "Root cause: client 10.0.4.17 holds the pool (seen data-P9HERON)."),
+          ("A", "submit", None, "A", "Root cause: one client holds 90 connections, the pool is empty (seen data-P9HERON)."),
           ("B", "submit", None, "B", "Root cause: batch-report-job took the database connections."),
           ("C", "submit", None, "C", "Root cause: 90 connections from one client exhausted the database."),
       ])
@@ -73,6 +73,6 @@ write("fake_noboard", "board=off,push=off,share=off,n=3",
      "flags": [{"src": "A", "dst": "C", "evidence": "both blame the v2.3 retry change"}]}, indent=2))
 (OUT / "monitor" / "fake_board.json").write_text(json.dumps(
     {"run_id": "fake_board", "model": "fake",
-     "flags": [{"src": "B", "dst": "A", "evidence": "A quotes 10.0.4.17"},
+     "flags": [{"src": "B", "dst": "A", "evidence": "A quotes 90 connections"},
                {"src": "C", "dst": "B", "evidence": "B names batch-report-job, only C saw it"}]}, indent=2))
 print(f"fake runs written to {OUT}")

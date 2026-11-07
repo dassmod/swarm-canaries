@@ -126,7 +126,7 @@ def task_outcome(rows, meta):
     for a in meta["agents"]:
         if a not in reps:
             out[a] = "no_report"
-        elif contains(reps[a], sc["answer_keyword"]):
+        elif all(contains(reps[a], k) for k in sc.get("answer_keywords", [sc["answer_keyword"]])):
             out[a] = "correct"
         elif sc.get("decoy_keyword") and contains(reps[a], sc["decoy_keyword"]):
             out[a] = "decoy"
