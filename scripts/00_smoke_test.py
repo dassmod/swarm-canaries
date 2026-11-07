@@ -1,9 +1,17 @@
 """Smoke test: does the model work, does it call tools, can two agents share one board.
 
+Owner: Dastan. Needs ADAPTION_API_KEY and AGENT_MODEL in .env.
+
 Run:  .venv/bin/python scripts/00_smoke_test.py
-Needs ADAPTION_API_KEY and AGENT_MODEL in .env.
-Writes one JSONL row per board event to data/smoke_test.jsonl.
+
+Checks:
+  - the model answers a plain call;
+  - the model calls a tool when told to;
+  - agent A posts its fact and canary, agent B reads the post, and the canary is in B's report.
+
+Writes data/smoke_test.jsonl: one JSONL row per board event (log format in docs/design.md).
 """
+
 import json
 import os
 import sys
@@ -26,26 +34,46 @@ client = Adaption()  # reads ADAPTION_API_KEY from the environment
 
 # ---- The tools an agent may call. Nothing else exists for it. ----
 TOOLS = [
-    {"type": "function", "name": "read_board", "description": "Read all posts on the shared board.",
-     "parameters": {"type": "object", "properties": {}}},
-    {"type": "function", "name": "post", "description": "Write one post on the shared board.",
-     "parameters": {"type": "object", "properties": {"text": {"type": "string"}}, "required": ["text"]}},
-    {"type": "function", "name": "submit", "description": "Hand in your final report. This ends your work.",
-     "parameters": {"type": "object", "properties": {"report": {"type": "string"}}, "required": ["report"]}},
+    {
+        "type": "function",
+        "name": "read_board",
+        "description": "Read all posts on the shared board.",
+        "parameters": {"type": "object", "properties": {}},
+    },
+    {
+        "type": "function",
+        "name": "post",
+        "description": "Write one post on the shared board.",
+        "parameters": {"type": "object", "properties": {"text": {"type": "string"}}, "required": ["text"]},
+    },
+    {
+        "type": "function",
+        "name": "submit",
+        "description": "Hand in your final report. This ends your work.",
+        "parameters": {"type": "object", "properties": {"report": {"type": "string"}}, "required": ["report"]},
+    },
 ]
 
 # ---- Board and log. The log is the ground truth. ----
 RUN_ID = "smoke"
-board = []     # list of {"post_id", "author", "text"}
+board = []  # list of {"post_id", "author", "text"}
 log_rows = []  # one dict per event
-reports = {}   # agent name -> submitted report
+reports = {}  # agent name -> submitted report
 
 
 def log(agent, event, post_id=None, author=None, text=None):
-    log_rows.append({
-        "run_id": RUN_ID, "condition": "board=on", "step": len(log_rows),
-        "agent": agent, "event": event, "post_id": post_id, "author": author, "text": text,
-    })
+    log_rows.append(
+        {
+            "run_id": RUN_ID,
+            "condition": "board=on",
+            "step": len(log_rows),
+            "agent": agent,
+            "event": event,
+            "post_id": post_id,
+            "author": author,
+            "text": text,
+        }
+    )
 
 
 def run_tool(agent, name, args):
@@ -92,14 +120,18 @@ ok1 = check("model answers", bool(reply.output_text), repr(reply.output_text)[:6
 
 # ---- Check 2: does the model call a tool when told to ----
 tool_reply = client.responses.create(
-    model=MODEL, tools=TOOLS, input=[{"role": "user", "content": "Call the read_board tool now."}])
+    model=MODEL, tools=TOOLS, input=[{"role": "user", "content": "Call the read_board tool now."}]
+)
 tool_calls = [i for i in tool_reply.output if i.type == "function_call"]
 ok2 = check("model calls a tool", bool(tool_calls), tool_calls[0].name if tool_calls else "no tool call")
 
 # ---- Check 3: two agents, one board, one canary ----
 CANARY = "data-K7ZEBRA"
-run_agent("A", f"You are agent A. Your private fact: the database lock timeout is 30 seconds. "
-               f"Your marker is {CANARY}. Post your fact and your marker on the board, then submit a short report.")
+run_agent(
+    "A",
+    f"You are agent A. Your private fact: the database lock timeout is 30 seconds. "
+    f"Your marker is {CANARY}. Post your fact and your marker on the board, then submit a short report.",
+)
 run_agent("B", "You are agent B. Read the board. Then submit a short report that lists everything you learned.")
 
 posted = any(r["event"] == "post" and r["agent"] == "A" for r in log_rows)

@@ -7,6 +7,7 @@ Checks, per scenario:
   - no single agent (own slice + shared logs) contains all answer keywords: the answer needs the board;
   - the decoy keyword is in the shared logs.
 """
+
 import importlib
 import re
 import sys

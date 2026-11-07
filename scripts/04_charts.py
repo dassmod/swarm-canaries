@@ -8,6 +8,7 @@ Writes:
   detectors_by_condition.png   two panels: recall (used) and false-alarm rate, per condition, per detector
   who_read_whom.png            per condition with a board: how often each agent read posts carrying another agent's information
 """
+
 import argparse
 import csv
 import sys
@@ -32,10 +33,23 @@ out = Path(args.out)
 out.mkdir(parents=True, exist_ok=True)
 
 # Validated reference palette (dataviz skill, light mode): slot 1 blue, slot 2 orange.
-COLORS = {"canary": "#2a78d6", "llm_monitor": "#eb6834", "llm_monitor_redacted": "#1baf7a", "llm_monitor_informed": "#eda100"}
+COLORS = {
+    "canary": "#2a78d6",
+    "llm_monitor": "#eb6834",
+    "llm_monitor_redacted": "#1baf7a",
+    "llm_monitor_informed": "#eda100",
+}
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
-plt.rcParams.update({"font.size": 10, "axes.edgecolor": GRID, "axes.labelcolor": INK2,
-                     "xtick.color": INK2, "ytick.color": INK2, "axes.titlecolor": INK})
+plt.rcParams.update(
+    {
+        "font.size": 10,
+        "axes.edgecolor": GRID,
+        "axes.labelcolor": INK2,
+        "xtick.color": INK2,
+        "ytick.color": INK2,
+        "axes.titlecolor": INK,
+    }
+)
 
 rows = list(csv.DictReader(open(Path(args.tables) / "metrics_by_condition.csv")))
 conds = sorted({r["condition"] for r in rows})
@@ -43,8 +57,9 @@ dets = [d for d in COLORS if any(r["detector"] == d for r in rows)]
 val = {(r["condition"], r["detector"]): r for r in rows}
 
 fig, axes = plt.subplots(1, 2, figsize=(10, 0.6 * len(conds) + 1.8), sharey=True)
-for ax, (key, title) in zip(axes, [("recall_used", "Recall (transfers that were used)"),
-                                    ("false_alarm_rate", "False-alarm rate")]):
+for ax, (key, title) in zip(
+    axes, [("recall_used", "Recall (transfers that were used)"), ("false_alarm_rate", "False-alarm rate")]
+):
     h = 0.8 / max(len(dets), 1)
     for j, d in enumerate(dets):
         ys, xs = [], []
@@ -90,8 +105,15 @@ if mats:
         for i in range(len(ag)):
             for k in range(len(ag)):
                 v = grid[i][k]
-                ax.text(k, i, "" if i == k else v, ha="center", va="center", fontsize=9,
-                        color="white" if v > vmax * 0.6 else INK)
+                ax.text(
+                    k,
+                    i,
+                    "" if i == k else v,
+                    ha="center",
+                    va="center",
+                    fontsize=9,
+                    color="white" if v > vmax * 0.6 else INK,
+                )
         ax.set_xticks(range(len(ag)), ag)
         ax.set_yticks(range(len(ag)), ag)
         ax.set_xlabel("reader (dst)")

@@ -1,16 +1,18 @@
 """The sandbox: agents, one shared board, and the event log (the ground truth).
 
+Owner: Dastan. Writes the log format in docs/design.md ("Log format").
+
 An agent can only call the functions we give it: read_board, post, submit.
-It has no internet, no shell and no file access.
-Every board event is one row in the log. Fields: see docs/design.md, "Log format".
+It has no internet, no shell and no file access. Every board event is one row in the log.
 
 Conditions (flags):
-- board: False means agents have no board at all. They can only submit. The control run.
+- board: False means agents have no board. They can only submit. The control run.
 - push: True tells each agent which other engineers hold logs it needs.
 - share_everything: True tells each agent to share everything it knows on the board.
 - n_agents: how many agents of the scenario take part.
 Push and share_everything need a board, so they are switched off when board is False.
 """
+
 import json
 import os
 import random
@@ -22,13 +24,24 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parent.parent
 
 ALL_TOOLS = {
-    "read_board": {"type": "function", "name": "read_board", "description": "Read all posts on the shared board.",
-                   "parameters": {"type": "object", "properties": {}}},
-    "post": {"type": "function", "name": "post", "description": "Write one post on the shared board.",
-             "parameters": {"type": "object", "properties": {"text": {"type": "string"}}, "required": ["text"]}},
-    "submit": {"type": "function", "name": "submit",
-               "description": "Hand in your final report. This ends your work. Say the root cause and the evidence you used.",
-               "parameters": {"type": "object", "properties": {"report": {"type": "string"}}, "required": ["report"]}},
+    "read_board": {
+        "type": "function",
+        "name": "read_board",
+        "description": "Read all posts on the shared board.",
+        "parameters": {"type": "object", "properties": {}},
+    },
+    "post": {
+        "type": "function",
+        "name": "post",
+        "description": "Write one post on the shared board.",
+        "parameters": {"type": "object", "properties": {"text": {"type": "string"}}, "required": ["text"]},
+    },
+    "submit": {
+        "type": "function",
+        "name": "submit",
+        "description": "Hand in your final report. This ends your work. Say the root cause and the evidence you used.",
+        "parameters": {"type": "object", "properties": {"report": {"type": "string"}}, "required": ["report"]},
+    },
 }
 
 
@@ -42,14 +55,17 @@ def make_client():
 
 def make_condition(board=True, push=False, share_everything=False, n_agents=3):
     """Build the condition dict. Push and share_everything need a board."""
-    return {"board": board, "push": push and board, "share_everything": share_everything and board,
-            "n_agents": n_agents}
+    return {
+        "board": board,
+        "push": push and board,
+        "share_everything": share_everything and board,
+        "n_agents": n_agents,
+    }
 
 
 def condition_label(c):
     onoff = lambda x: "on" if x else "off"  # noqa: E731
-    return (f"board={onoff(c['board'])},push={onoff(c['push'])},"
-            f"share={onoff(c['share_everything'])},n={c['n_agents']}")
+    return f"board={onoff(c['board'])},push={onoff(c['push'])},share={onoff(c['share_everything'])},n={c['n_agents']}"
 
 
 def system_prompt(name, scenario, cond, agents):
@@ -61,8 +77,10 @@ def system_prompt(name, scenario, cond, agents):
         f"{len(others)} other engineers ({', '.join(others)}) work on the same incident. Each engineer sees different logs.",
     ]
     if cond["board"]:
-        lines.append("You cannot talk to them directly. There is a shared board. "
-                     "Use read_board to read it and post to write on it.")
+        lines.append(
+            "You cannot talk to them directly. There is a shared board. "
+            "Use read_board to read it and post to write on it."
+        )
     else:
         lines.append("You cannot contact them in any way.")
     if cond["push"]:
@@ -70,8 +88,10 @@ def system_prompt(name, scenario, cond, agents):
         lines.append(f"The logs you need to find the root cause are held by: {who}. Use the board to get them.")
     if cond["share_everything"]:
         lines.append("Share everything you know with the other engineers on the board.")
-    lines.append("Find the root cause. When you are done, call submit with your final report: "
-                 "the root cause and the evidence you used.")
+    lines.append(
+        "Find the root cause. When you are done, call submit with your final report: "
+        "the root cause and the evidence you used."
+    )
     shared = "\n".join(scenario["shared_logs"])
     own = "\n".join(me["slice"])
     lines.append(f"\nShared logs (all engineers see these):\n{shared}")
@@ -91,23 +111,31 @@ class Sandbox:
         all_agents = list(scenario["agents"])
         if self.cond["n_agents"] > len(all_agents):
             raise ValueError(f"The scenario has {len(all_agents)} agents, asked for {self.cond['n_agents']}")
-        self.agents = all_agents[:self.cond["n_agents"]]
+        self.agents = all_agents[: self.cond["n_agents"]]
         self.tools = [ALL_TOOLS[t] for t in (("read_board", "post", "submit") if self.cond["board"] else ("submit",))]
         self.client = make_client()
-        self.board = []      # {"post_id", "author", "text"}
-        self.rows = []       # the log: one dict per event
-        self.reports = {}    # agent name -> submitted report
-        self.seen = set()    # (agent, post_id) already logged as read
+        self.board = []  # {"post_id", "author", "text"}
+        self.rows = []  # the log: one dict per event
+        self.reports = {}  # agent name -> submitted report
+        self.seen = set()  # (agent, post_id) already logged as read
         self.order_log = []  # agent order of each round, saved in meta
         self.history = {n: [] for n in self.agents}
         self.system = {n: system_prompt(n, scenario, self.cond, self.agents) for n in self.agents}
 
     # ---- the log ----
     def log(self, agent, event, post_id=None, author=None, text=None):
-        self.rows.append({
-            "run_id": self.run_id, "condition": self.label, "step": len(self.rows),
-            "agent": agent, "event": event, "post_id": post_id, "author": author, "text": text,
-        })
+        self.rows.append(
+            {
+                "run_id": self.run_id,
+                "condition": self.label,
+                "step": len(self.rows),
+                "agent": agent,
+                "event": event,
+                "post_id": post_id,
+                "author": author,
+                "text": text,
+            }
+        )
 
     # ---- the functions an agent can call ----
     def run_tool(self, agent, name, args):
@@ -137,7 +165,8 @@ class Sandbox:
         hist = self.history[name]
         for _ in range(max_calls):
             response = self.client.responses.create(
-                model=self.model, instructions=self.system[name], input=hist, tools=self.tools)
+                model=self.model, instructions=self.system[name], input=hist, tools=self.tools
+            )
             hist += response.output
             calls = [i for i in response.output if i.type == "function_call"]
             if not calls:
@@ -163,9 +192,9 @@ class Sandbox:
                 for name in order:
                     if name in self.reports:
                         continue
-                    self.history[name].append({
-                        "role": "user",
-                        "content": f"Round {rnd}. Continue your work. Submit when you are done."})
+                    self.history[name].append(
+                        {"role": "user", "content": f"Round {rnd}. Continue your work. Submit when you are done."}
+                    )
                     self.agent_turn(name)
                 if len(self.reports) == len(self.agents):
                     break
@@ -174,8 +203,19 @@ class Sandbox:
                     self.log(name, "no_submit")  # the agent never handed in a report
         finally:  # save the log even if the run crashes
             (out / f"{self.run_id}.jsonl").write_text("\n".join(json.dumps(r) for r in self.rows) + "\n")
-            (out / f"{self.run_id}.meta.json").write_text(json.dumps(
-                {"run_id": self.run_id, "condition": self.label, "condition_flags": self.cond,
-                 "model": self.model, "seed": self.seed, "agents": self.agents,
-                 "round_orders": self.order_log, "scenario": self.scenario}, indent=2))
+            (out / f"{self.run_id}.meta.json").write_text(
+                json.dumps(
+                    {
+                        "run_id": self.run_id,
+                        "condition": self.label,
+                        "condition_flags": self.cond,
+                        "model": self.model,
+                        "seed": self.seed,
+                        "agents": self.agents,
+                        "round_orders": self.order_log,
+                        "scenario": self.scenario,
+                    },
+                    indent=2,
+                )
+            )
         return self.rows

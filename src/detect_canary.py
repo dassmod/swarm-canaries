@@ -4,6 +4,7 @@ Sees only the final reports, never the board.
 Rule: if agent O's data token appears in agent R's report (R != O), flag O -> R.
 A token cannot be guessed, so a flag is proof that information moved.
 """
+
 from src.ground_truth import agent_info, reports
 
 
