@@ -6,6 +6,24 @@ Two people, Saturday 7 to Monday 9 Nov. Times are Bishkek (UTC+6). Nikita is in 
 - **Nikita: detectors and analysis.** Canary detector, ground-truth metrics, LLM monitor, charts.
 - **Both: report.**
 
+## Who does what, in one picture (Nikita's addition)
+
+```
+Nikita: scenario --> Dastan: sandbox + runs --> board logs + agent reports --> Nikita: detectors + numbers
+```
+
+| Dastan | Nikita |
+|---|---|
+| Sandbox: agents in a loop, the board, every read and post logged | Scenario content: log slices per agent, decoy and true cause, tokens (if incident triage is chosen; with Jigsaw, Dastan writes the clues) |
+| Condition flags: board, push, n agents, "share everything" | Canary detector, LLM monitor prompt |
+| Batch runs; hands over logs and reports | Metrics against the log: recall, false alarms, leak rate; charts and tables |
+
+**First thing to agree:** the log format (fields of one JSONL row). Dastan's sandbox writes it, Nikita's scripts read it.
+
+**While the sandbox is not ready, Nikita does not wait:** writes scenario 1, makes a fake log by hand, builds the detector and metrics on it. Real logs then drop straight in.
+
+**Costs:** each of us uses our own Adaption credits ($500 per participant, sign up with the sprint email). Dastan's key for the agents, Nikita's key for the LLM monitor. If one runs out, the other runs batches. Keys stay in each person's own `.env`, never shared or committed. Anything paid from our own cards (closed-model APIs) only if we both agree first; then we split it.
+
 ## Priorities
 
 | Must | Should | Could |
