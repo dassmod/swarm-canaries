@@ -28,18 +28,11 @@ Nikita: scenario --> Dastan: sandbox + runs --> board logs + agent reports --> N
 
 | Must | Should | Could |
 |---|---|---|
-| Sandbox with board and log; canary detector; recall and false alarms vs ground truth; board vs no board; push vs no push | LLM monitor on the same reports; 3 vs 6 agents; canary placement (in task data vs private note) | Lead-follow test ("talked or just alike"); second model; natural-fact canaries |
+| Sandbox with board and log; canary detector; LLM monitor; recall and false alarms vs ground truth (two levels, read and used); leak rate; board vs no board; push vs no push | "Share everything" vs normal; 3 vs 6 agents; canary placement | Lead-follow test ("talked or just alike"); second model; natural-fact canaries |
 
 Cut from the right when time runs short.
 
-**Nikita's proposal for the priorities (decide in block 0):**
-
-| Change | Why |
-|---|---|
-| LLM monitor: Should to Must | The headline ("monitor mistakes likeness for communication") needs it |
-| Leak rate: add to Must | Free: read straight from the board log, no detector needed |
-| Two-level ground truth (read, used): add to Must | Part of the metrics script; recall against "read" alone looks worse than it is |
-| "Share everything" instruction vs normal: add to Should | Does the leak rate rise with accuracy (HiddenBench says accuracy rises) |
+**Decided 7 Nov (block 0):** LLM monitor, leak rate and two-level ground truth moved to Must; "share everything" added to Should. Why: the headline needs the monitor; leak rate is free from the board log; recall against "read" alone looks worse than it is. Reasons in `docs/design.md`.
 
 ## Saturday
 
