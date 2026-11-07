@@ -8,11 +8,15 @@ Run:
   .venv/bin/python scripts/05_run_plan.py --dry-run              # list the jobs, call no model
   .venv/bin/python scripts/05_run_plan.py                        # run all jobs, 5 at a time
   .venv/bin/python scripts/05_run_plan.py --repeats 2 --workers 3
+  .venv/bin/python scripts/05_run_plan.py --series main,push,share,six --first-seed 5   # a second batch of 5 per cell
 
 The plan (repeats per cell, default 5):
   main              scenarios 1, 2, 3   with board and without board
   push              scenarios 1, 2, 3   --push
   share everything  scenarios 1, 2, 3   --share-everything
+  stealth           scenarios 1, 2, 3   --stealth
+  stealth hard      scenarios 1, 2, 3   --stealth-hard
+  ticket            scenarios 1, 2, 3   --channel ticket
   six agents        scenario 4          with board and without board
 
 Repeat k uses seed k in every condition, so the agent order is the same across conditions.
@@ -44,6 +48,9 @@ for s in (1, 2, 3):
     CELLS.append(("main", s, ["--no-board"], make_condition(False, False, False, N3)))
     CELLS.append(("push", s, ["--push"], make_condition(True, True, False, N3)))
     CELLS.append(("share", s, ["--share-everything"], make_condition(True, False, True, N3)))
+    CELLS.append(("stealth", s, ["--stealth"], make_condition(True, False, False, N3, True)))
+    CELLS.append(("hard", s, ["--stealth-hard"], make_condition(True, False, False, N3, False, True)))
+    CELLS.append(("ticket", s, ["--channel", "ticket"], make_condition(True, False, False, N3, channel="ticket")))
 CELLS.append(("six", 4, [], make_condition(True, False, False, N6)))
 CELLS.append(("six", 4, ["--no-board"], make_condition(False, False, False, N6)))
 
@@ -75,11 +82,17 @@ def run_job(job):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--repeats", type=int, default=5)
+    ap.add_argument(
+        "--first-seed", type=int, default=0, help="seeds first-seed to first-seed+repeats-1 (new seeds = new runs)"
+    )
+    ap.add_argument("--series", default="", help="comma list of main,push,share,stealth,hard,ticket,six (default: all)")
     ap.add_argument("--workers", type=int, default=5)
     ap.add_argument("--dry-run", action="store_true", help="list the jobs and stop")
     args = ap.parse_args()
 
-    jobs = [(*cell, seed) for seed in range(args.repeats) for cell in CELLS]
+    wanted = set(args.series.split(",")) if args.series else {c[0] for c in CELLS}
+    seeds = range(args.first_seed, args.first_seed + args.repeats)
+    jobs = [(*cell, seed) for seed in seeds for cell in CELLS if cell[0] in wanted]
     todo = [j for j in jobs if not is_complete(j[1], j[3], j[4])]
     print(f"{len(jobs)} jobs in the plan, {len(jobs) - len(todo)} already complete, {len(todo)} to run", flush=True)
     if args.dry_run:

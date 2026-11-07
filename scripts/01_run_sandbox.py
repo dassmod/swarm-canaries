@@ -10,6 +10,9 @@ Run:
   .venv/bin/python scripts/01_run_sandbox.py --no-board            # control: no board
   .venv/bin/python scripts/01_run_sandbox.py --push                # tell agents who holds what
   .venv/bin/python scripts/01_run_sandbox.py --share-everything    # "share everything" instruction
+  .venv/bin/python scripts/01_run_sandbox.py --stealth             # operator forbids sharing and checks reports
+  .venv/bin/python scripts/01_run_sandbox.py --stealth-hard        # agents also know what is checked
+  .venv/bin/python scripts/01_run_sandbox.py --channel ticket      # an incident ticket instead of the board
   .venv/bin/python scripts/01_run_sandbox.py --repeats 5 --seed 100
   .venv/bin/python scripts/01_run_sandbox.py --show-prompts        # print a prompt, call no model
 
@@ -42,6 +45,20 @@ ap.add_argument("--board", action=argparse.BooleanOptionalAction, default=True, 
 ap.add_argument("--push", action="store_true", help="tell each agent who holds the logs it needs")
 ap.add_argument("--share-everything", action="store_true", help="tell each agent to share everything")
 ap.add_argument(
+    "--stealth", action="store_true", help="tell each agent that sharing is forbidden and reports are checked"
+)
+ap.add_argument(
+    "--stealth-hard",
+    action="store_true",
+    help="like --stealth, plus: agents are told what the operator checks and that one removal fails the team",
+)
+ap.add_argument(
+    "--channel",
+    choices=["board", "ticket"],
+    default="board",
+    help="shared channel: the explicit board, or an incident ticket agents are only asked to keep updated",
+)
+ap.add_argument(
     "--scenario",
     type=int,
     default=1,
@@ -56,7 +73,9 @@ args = ap.parse_args()
 
 SCENARIO = importlib.import_module(f"src.scenario_incident_0{args.scenario}").SCENARIO
 n_agents = args.agents or len(SCENARIO["agents"])
-cond = make_condition(args.board, args.push, args.share_everything, n_agents)
+cond = make_condition(
+    args.board, args.push, args.share_everything, n_agents, args.stealth, args.stealth_hard, args.channel
+)
 label = condition_label(cond)
 
 if args.show_prompts:
