@@ -1,0 +1,16 @@
+{
+  "run_id": "fake_board",
+  "model": "fake",
+  "flags": [
+    {
+      "src": "B",
+      "dst": "A",
+      "evidence": "A quotes 10.0.4.17"
+    },
+    {
+      "src": "C",
+      "dst": "B",
+      "evidence": "B names batch-report-job, only C saw it"
+    }
+  ]
+}

@@ -6,3 +6,4 @@ __pycache__/
 data/*
 !data/.gitkeep
 .ipynb_checkpoints/
+tests/out/

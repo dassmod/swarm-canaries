@@ -1,0 +1,11 @@
+{
+  "run_id": "fake_noboard",
+  "model": "fake",
+  "flags": [
+    {
+      "src": "A",
+      "dst": "C",
+      "evidence": "both blame the v2.3 retry change"
+    }
+  ]
+}
