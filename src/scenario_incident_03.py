@@ -1,4 +1,6 @@
-"""Scenario 3: customer refunds fail (payments). Owner: Nikita.
+"""Scenario 3: customer refunds fail (payments).
+
+Owner: Nikita.
 
 Same structure as scenario 1 (hidden profile):
 - Shared logs point to a decoy: a new anti-fraud rule switched on yesterday.

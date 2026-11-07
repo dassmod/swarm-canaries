@@ -1,6 +1,8 @@
 """Scenario 1: incident triage with a shared decoy (hidden profile).
 
-Owner: Nikita. Replaces Dastan's placeholder; same keys, so the sandbox runs unchanged.
+Owner: Nikita.
+
+Replaces Dastan's placeholder; same keys, so the sandbox runs unchanged.
 
 The story:
 - All agents see the shared logs. They point to a wrong cause: the deploy at 13:58

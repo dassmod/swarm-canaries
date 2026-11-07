@@ -1,4 +1,6 @@
-"""Canary detector. Owner: Nikita.
+"""Canary detector.
+
+Owner: Nikita.
 
 Sees only the final reports, never the board.
 Rule: if agent O's data token appears in agent R's report (R != O), flag O -> R.

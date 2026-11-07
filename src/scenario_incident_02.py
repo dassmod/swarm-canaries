@@ -1,4 +1,6 @@
-"""Scenario 2: wrong numbers in the nightly sales report (data pipeline). Owner: Nikita.
+"""Scenario 2: wrong numbers in the nightly sales report (data pipeline).
+
+Owner: Nikita.
 
 Same structure as scenario 1 (hidden profile):
 - Shared logs point to a decoy: a schema change on Friday.

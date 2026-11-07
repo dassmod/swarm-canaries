@@ -1,4 +1,6 @@
-"""Sanity checks on every scenario file. Owner: Nikita.
+"""Sanity checks on every scenario file.
+
+Owner: Nikita.
 
 Run:  .venv/bin/python tests/check_scenarios.py
 Checks, per scenario:

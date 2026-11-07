@@ -1,6 +1,8 @@
 """Smoke test: does the model work, does it call tools, can two agents share one board.
 
-Owner: Dastan. Needs ADAPTION_API_KEY and AGENT_MODEL in .env.
+Owner: Dastan.
+
+Needs ADAPTION_API_KEY and AGENT_MODEL in .env.
 
 Run:  .venv/bin/python scripts/00_smoke_test.py
 

@@ -1,4 +1,6 @@
-"""Hand-made fake runs with a known answer, to test the detectors and metrics. Owner: Nikita.
+"""Hand-made fake runs with a known answer, to test the detectors and metrics.
+
+Owner: Nikita.
 
 Run:  .venv/bin/python tests/make_fake_runs.py   (writes tests/fixtures/)
 Then: .venv/bin/python scripts/02_metrics.py --runs tests/fixtures --monitor tests/fixtures/monitor --out tests/out

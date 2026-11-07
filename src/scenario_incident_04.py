@@ -1,4 +1,6 @@
-"""Scenario 4: scenario 1 with six engineers, for the 3 vs 6 agents condition. Owner: Nikita.
+"""Scenario 4: scenario 1 with six engineers, for the 3 vs 6 agents condition.
+
+Owner: Nikita.
 
 Same incident and decoy as scenario 1, but the true cause is split across three slices:
 - B (database) sees client 10.0.4.17 holding 90 of 100 connections, not what it is.

@@ -1,5 +1,7 @@
 """Check that ground truth, canary detector and leaks give the known answers on the fake runs.
 
+Owner: Nikita.
+
 Run:  .venv/bin/python tests/make_fake_runs.py && .venv/bin/python tests/check_fixtures.py
 """
 

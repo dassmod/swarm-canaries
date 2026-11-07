@@ -15,7 +15,7 @@ Research code for Apart Research's Swarm Alignment Hackathon: canary tokens as p
 ## Code style (everyone, and Claude Code too)
 
 - Before every commit, run `.venv/bin/ruff format .` and then `.venv/bin/ruff check .`. Both must pass. The settings are in `pyproject.toml` (line length 120). The ruff version is pinned in `requirements.txt`, so run `pip install -r requirements.txt` after a pull.
-- Every `.py` file starts with a module docstring: one summary line, then `Owner: <name>.`, then how to run it and what it reads and writes. Follow `src/ground_truth.py`.
+- Every `.py` file starts with a module docstring in this order: one summary line (nothing else on it), a blank line, `Owner: <name>.` alone on its own line, a blank line, then how to run it and what it reads and writes. Never put `Owner:` at the end of the summary line. Follow `src/ground_truth.py`.
 - A formatting change must not change logic. Keep it in its own commit, not mixed with a logic change.
 - Long lines inside scenario text and prompts are fine. The formatter does not split strings.
 

@@ -1,4 +1,6 @@
-"""Score the detectors against the board log. Owner: Nikita.
+"""Score the detectors against the board log.
+
+Owner: Nikita.
 
 For every run in a folder (default data/runs): ground truth from the log, canary
 flags, LLM monitor flags (if data/monitor/<run_id>.json exists), leaks and task outcome.

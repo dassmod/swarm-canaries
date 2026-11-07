@@ -1,6 +1,8 @@
 """The sandbox: agents, one shared board, and the event log (the ground truth).
 
-Owner: Dastan. Writes the log format in docs/design.md ("Log format").
+Owner: Dastan.
+
+Writes the log format in docs/design.md ("Log format").
 
 An agent can only call the functions we give it: read_board, post, submit.
 It has no internet, no shell and no file access. Every board event is one row in the log.
@@ -66,6 +68,11 @@ def make_condition(board=True, push=False, share_everything=False, n_agents=3):
 def condition_label(c):
     onoff = lambda x: "on" if x else "off"  # noqa: E731
     return f"board={onoff(c['board'])},push={onoff(c['push'])},share={onoff(c['share_everything'])},n={c['n_agents']}"
+
+
+def condition_tag(c):
+    """Short condition code for run ids, for example b1p0h0n3. Keeps run ids unique across conditions."""
+    return f"b{int(c['board'])}p{int(c['push'])}h{int(c['share_everything'])}n{c['n_agents']}"
 
 
 def system_prompt(name, scenario, cond, agents):

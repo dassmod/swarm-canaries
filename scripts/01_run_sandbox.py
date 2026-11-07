@@ -1,6 +1,8 @@
 """Run the sandbox: agents on one incident scenario, one condition, one or more repeats.
 
-Owner: Dastan. Needs ADAPTION_API_KEY and AGENT_MODEL in .env.
+Owner: Dastan.
+
+Needs ADAPTION_API_KEY and AGENT_MODEL in .env.
 
 Run:
   .venv/bin/python scripts/01_run_sandbox.py                       # scenario 1, board on
@@ -33,7 +35,7 @@ sys.path.insert(0, str(ROOT))
 import importlib  # noqa: E402
 
 from src.ground_truth import load_run, task_outcome  # noqa: E402
-from src.sandbox import Sandbox, condition_label, make_client, make_condition, system_prompt  # noqa: E402
+from src.sandbox import Sandbox, condition_label, condition_tag, make_client, make_condition, system_prompt  # noqa: E402
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--board", action=argparse.BooleanOptionalAction, default=True, help="agents have a board (default on)")
@@ -73,7 +75,7 @@ if not MODEL:
     sys.exit("Put AGENT_MODEL in .env")
 
 for i in range(args.repeats):
-    run_id = time.strftime("run_%Y%m%d_%H%M%S") + f"_s{args.scenario}_seed{args.seed + i}"
+    run_id = time.strftime("run_%Y%m%d_%H%M%S") + f"_s{args.scenario}_{condition_tag(cond)}_seed{args.seed + i}"
     box = Sandbox(run_id, SCENARIO, MODEL, cond, seed=args.seed + i)
     rows = box.run()
     counts = Counter((r["agent"], r["event"]) for r in rows)

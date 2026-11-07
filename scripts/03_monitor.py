@@ -1,4 +1,5 @@
 """LLM monitor: a model reads the agents' final reports and says who passed information to whom.
+
 Owner: Nikita.
 
 It never sees the board or the log, the same as the canary detector.

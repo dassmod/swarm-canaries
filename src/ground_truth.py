@@ -1,6 +1,8 @@
 """Ground truth from the board log: which information really moved between agents.
 
-Owner: Nikita. Reads the log format in docs/design.md ("Log format").
+Owner: Nikita.
+
+Reads the log format in docs/design.md ("Log format").
 
 Two levels (decided 7 Nov):
 - read: agent R read a post that carries information from agent O.

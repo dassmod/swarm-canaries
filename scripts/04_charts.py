@@ -1,4 +1,6 @@
-"""Charts for the report, from the tables scripts/02_metrics.py writes. Owner: Nikita.
+"""Charts for the report, from the tables scripts/02_metrics.py writes.
+
+Owner: Nikita.
 
 Run:
   .venv/bin/python scripts/04_charts.py                          # results/ -> results/
