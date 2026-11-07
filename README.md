@@ -34,14 +34,14 @@ data/                raw run logs (not committed)
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # then put your Adaption key and model in .env
+cp .env.example .env   # then put your Adaption key in .env
 ```
 
 ## Tools
 
 | Tool | What for |
 |---|---|
-| Python 3.11+ with `openai` SDK | Agent calls. Adaption's inference API is OpenAI-compatible |
+| Python 3.11+ with the `adaption` SDK | Agent calls (Responses API with function tools). The docs show no OpenAI-compatible endpoint |
 | Adaption inference stack | Hosted open models for the agents and the LLM monitor (credits from the sprint) |
 | OpenRouter free tier | Fallback if no Adaption model talks or rate limits bite |
 | DuckDB + pandas | Querying run logs |
