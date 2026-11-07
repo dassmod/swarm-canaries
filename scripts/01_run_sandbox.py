@@ -63,6 +63,10 @@ if args.show_prompts:
     print(system_prompt(names[0], SCENARIO, cond, names))
     sys.exit(0)
 
+# Credits per 1M tokens (input, output), from the Models page of docs.adaptionlabs.ai. Cached input is cheaper, so
+# the estimate is an upper bound.
+PRICES_PER_MILLION = {"qwen3.5-397b": (0.55, 3.50), "gemma-4-31b-it": (0.09, 0.34)}
+
 make_client()  # loads .env
 MODEL = os.getenv("AGENT_MODEL")
 if not MODEL:
@@ -82,3 +86,9 @@ for i in range(args.repeats):
         print(f"  {a}: {ev}  answer {outcome[a]}")
     cross = [r for r in rows if r["event"] == "read" and r["post_id"] is not None and r["author"] != r["agent"]]
     print(f"  reads of another agent's post: {len(cross)}")
+    u = box.usage
+    price = PRICES_PER_MILLION.get(MODEL)
+    cost = (
+        f", about {(u['input_tokens'] * price[0] + u['output_tokens'] * price[1]) / 1e6:.3f} credits" if price else ""
+    )
+    print(f"  model calls: {u['calls']}, tokens in/out: {u['input_tokens']}/{u['output_tokens']}{cost}")

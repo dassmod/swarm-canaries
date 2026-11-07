@@ -119,6 +119,7 @@ class Sandbox:
         self.reports = {}  # agent name -> submitted report
         self.seen = set()  # (agent, post_id) already logged as read
         self.order_log = []  # agent order of each round, saved in meta
+        self.usage = {"calls": 0, "input_tokens": 0, "output_tokens": 0}  # for the cost of a run, saved in meta
         self.history = {n: [] for n in self.agents}
         self.system = {n: system_prompt(n, scenario, self.cond, self.agents) for n in self.agents}
 
@@ -168,6 +169,10 @@ class Sandbox:
                 model=self.model, instructions=self.system[name], input=hist, tools=self.tools
             )
             hist += response.output
+            self.usage["calls"] += 1
+            if response.usage:
+                self.usage["input_tokens"] += response.usage.input_tokens
+                self.usage["output_tokens"] += response.usage.output_tokens
             calls = [i for i in response.output if i.type == "function_call"]
             if not calls:
                 return
@@ -213,6 +218,7 @@ class Sandbox:
                         "seed": self.seed,
                         "agents": self.agents,
                         "round_orders": self.order_log,
+                        "usage": self.usage,
                         "scenario": self.scenario,
                     },
                     indent=2,
