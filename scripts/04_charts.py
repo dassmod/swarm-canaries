@@ -7,8 +7,12 @@ Run:
   .venv/bin/python scripts/04_charts.py --tables tests/out --runs tests/fixtures --out tests/out
 
 Writes:
-  detectors_by_condition.png   two panels: recall (used) and false-alarm rate, per condition, per detector
-  who_read_whom.png            per condition with a board: how often each agent read posts carrying another agent's information
+  detectors_by_condition.png   four panels per condition and detector: recall at the read, used and integrated
+                               levels, and the false-alarm rate. The fact canary is left out of the used and
+                               integrated panels: those levels are defined by the same facts, so its recall there
+                               is 1.0 by construction.
+  who_read_whom.png            per condition with a board: how often each agent read posts carrying another
+                               agent's information, one small matrix per condition, four per row
 """
 
 import argparse
@@ -58,71 +62,87 @@ rows = list(csv.DictReader(open(Path(args.tables) / "metrics_by_condition.csv"))
 conds = sorted({r["condition"] for r in rows})
 dets = [d for d in COLORS if any(r["detector"] == d for r in rows)]
 val = {(r["condition"], r["detector"]): r for r in rows}
+has_integrated = "recall_integrated" in rows[0]
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 0.6 * len(conds) + 1.8), sharey=True)
-for ax, (key, title) in zip(
-    axes, [("recall_used", "Recall (transfers that were used)"), ("false_alarm_rate", "False-alarm rate")]
-):
-    h = 0.8 / max(len(dets), 1)
-    for j, d in enumerate(dets):
+panels = [
+    ("recall_read", "Recall: read", dets),
+    ("recall_used", "Recall: used", [d for d in dets if d != "fact_canary"]),
+]
+if has_integrated:
+    panels.append(("recall_integrated", "Recall: integrated", [d for d in dets if d != "fact_canary"]))
+panels.append(("false_alarm_rate", "False-alarm rate", dets))
+
+fig, axes = plt.subplots(
+    1, len(panels), figsize=(4.2 * len(panels) + 3.5, 0.55 * len(conds) * len(dets) / 3 + 2.2), sharey=True
+)
+for ax, (key, title, shown) in zip(axes, panels):
+    h = 0.84 / max(len(shown), 1)
+    for j, d in enumerate(shown):
         ys, xs = [], []
         for i, c in enumerate(conds):
             r = val.get((c, d))
-            v = r[key] if r else ""
+            v = r.get(key, "") if r else ""
             if v != "":
-                ys.append(i + (j - (len(dets) - 1) / 2) * h)
+                ys.append(i + (j - (len(shown) - 1) / 2) * h)
                 xs.append(float(v))
-        ax.barh(ys, xs, height=h * 0.9, color=COLORS[d], label=d.replace("_", " "))
+        ax.barh(ys, xs, height=h * 0.85, color=COLORS[d], label=d.replace("_", " "))
         for y, x in zip(ys, xs):
-            ax.text(x + 0.01, y, f"{x:.2f}", va="center", fontsize=8, color=INK2)
+            ax.text(x + 0.015, y, f"{x:.2f}", va="center", fontsize=6.5, color=INK2)
     ax.set_title(title, loc="left", fontsize=11)
-    ax.set_xlim(0, 1.1)
+    ax.set_xlim(0, 1.15)
     ax.grid(axis="x", color=GRID, linewidth=0.8)
     ax.set_axisbelow(True)
-    for s in ("top", "right"):
-        ax.spines[s].set_visible(False)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
 axes[0].set_yticks(range(len(conds)))
-axes[0].set_yticklabels([c.replace(",", "  ") for c in conds])
+axes[0].set_yticklabels([c.replace(",", "  ") for c in conds], fontsize=8)
 axes[0].invert_yaxis()
-axes[1].legend(frameon=False, loc="lower right")
-fig.tight_layout()
+handles, labels = axes[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc="lower center", ncol=len(dets), frameon=False, bbox_to_anchor=(0.5, 0.0))
+fig.tight_layout(rect=(0, 0.04, 1, 1))
 fig.savefig(out / "detectors_by_condition.png", dpi=200)
 print(f"wrote {out / 'detectors_by_condition.png'}")
 
-# Who read whom, summed over runs, one panel per condition with a board.
-mats, agents_all = defaultdict(lambda: defaultdict(int)), set()
+# Who read whom, summed over runs, one small matrix per condition with a board, four per row.
+mats, agents_by = defaultdict(lambda: defaultdict(int)), defaultdict(set)
 for log_path in sorted(Path(args.runs).glob("*.jsonl")):
     rws, meta = load_run(log_path)
     if not meta["condition_flags"]["board"]:
         continue
-    agents_all |= set(meta["agents"])
-    for (s, d), posts in ground_truth(rws, meta)["read"].items():
+    agents_by[meta["condition"]] |= set(meta["agents"])
+    for (s, d), _posts in ground_truth(rws, meta)["read"].items():
         mats[meta["condition"]][(s, d)] += 1
 if mats:
-    ag = sorted(agents_all)
-    fig, axes = plt.subplots(1, len(mats), figsize=(3.6 * len(mats) + 1.0, 3.6), squeeze=False)
+    items = sorted(mats.items())
+    ncol = min(4, len(items))
+    nrow = (len(items) + ncol - 1) // ncol
+    fig, axes = plt.subplots(nrow, ncol, figsize=(3.6 * ncol, 3.7 * nrow), squeeze=False)
     vmax = max(v for m in mats.values() for v in m.values())
-    for ax, (cond, m) in zip(axes[0], sorted(mats.items())):
+    for k, (cond, m) in enumerate(items):
+        ax = axes[k // ncol][k % ncol]
+        ag = sorted(agents_by[cond])
         grid = [[m.get((s, d), 0) for d in ag] for s in ag]
         ax.imshow(grid, cmap="Blues", vmin=0, vmax=vmax)
         for i in range(len(ag)):
-            for k in range(len(ag)):
-                v = grid[i][k]
+            for j in range(len(ag)):
+                v = grid[i][j]
                 ax.text(
-                    k,
+                    j,
                     i,
-                    "" if i == k else v,
+                    "" if i == j else v,
                     ha="center",
                     va="center",
-                    fontsize=9,
+                    fontsize=8,
                     color="white" if v > vmax * 0.6 else INK,
                 )
         ax.set_xticks(range(len(ag)), ag)
         ax.set_yticks(range(len(ag)), ag)
-        ax.set_xlabel("reader (dst)")
-        ax.set_ylabel("source (src)")
-        ax.set_title(cond.replace(",", " "), fontsize=8, loc="left")
-    fig.suptitle("Runs with a read transfer, source to reader", x=0.02, ha="left", fontsize=10, color=INK)
+        ax.set_xlabel("reader (dst)", fontsize=8)
+        ax.set_ylabel("source (src)", fontsize=8)
+        ax.set_title(cond.replace("board=on,", "").replace(",", " "), fontsize=7.5, loc="left")
+    for k in range(len(items), nrow * ncol):
+        axes[k // ncol][k % ncol].axis("off")
+    fig.suptitle("Runs with a read transfer, source to reader", x=0.01, ha="left", fontsize=11, color=INK)
     fig.tight_layout()
     fig.savefig(out / "who_read_whom.png", dpi=200)
     print(f"wrote {out / 'who_read_whom.png'}")
