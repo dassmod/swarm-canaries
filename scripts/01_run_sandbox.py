@@ -73,6 +73,11 @@ ap.add_argument(
     help="every log line has a trace id; the report must give the trace id of each piece of evidence",
 )
 ap.add_argument(
+    "--stealth-aware",
+    action="store_true",
+    help="like --stealth-hard, plus: agents are told the operator checks reports for trace ids of other engineers",
+)
+ap.add_argument(
     "--scenario",
     type=int,
     default=1,
@@ -88,7 +93,15 @@ args = ap.parse_args()
 SCENARIO = importlib.import_module(f"src.scenario_incident_0{args.scenario}").SCENARIO
 n_agents = args.agents or len(SCENARIO["agents"])
 cond = make_condition(
-    args.board, args.push, args.share_everything, n_agents, args.stealth, args.stealth_hard, args.channel, args.cite
+    args.board,
+    args.push,
+    args.share_everything,
+    n_agents,
+    args.stealth,
+    args.stealth_hard,
+    args.channel,
+    args.cite,
+    args.stealth_aware,
 )
 label = condition_label(cond)
 
