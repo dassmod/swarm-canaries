@@ -6,11 +6,18 @@ Research code for Apart Research's Swarm Alignment Hackathon: canary tokens as p
 
 - Only weekend work is judged. Anything written before 7 Nov 2026 is marked as pre-existing in the README.
 - No fabricated numbers. Every figure in the report comes from a script in `scripts/` that can be re-run.
-- The repo is public. Never commit `.env` or anything in `data/`.
+- The repo is public at `github.com/dassmod/swarm-canaries` (git remote `personal`; the remote `origin` does not work). Anything pushed is visible to everyone. Never commit `.env`, API keys or anything in `data/`.
 - Agents in the sandbox can only call the functions we give them. No internet, no shell, no file access for agents.
 - Log every board read and post as one JSONL row. The log is the ground truth.
 - Record decisions and findings in `docs/log.md`, newest first.
 - Never use em-dashes or en-dashes in prose.
+
+## Report and data
+
+- `report/draft.md` is the source of the report. Change the text there, then run `scripts/12_build_report.py`. `scripts/13_build_slides.py` builds the slides. Both need Google Chrome; run `scripts/11_cover_cone.py` first for the slide backgrounds.
+- Raw logs and monitor outputs stay in `data/` and are shared between us as an archive. `data/runs` holds the 465 runs in the report. Crashed runs, probes and the old scenario 4 are kept apart in `data/runs_excluded/` and `data/runs_v1_s4/`.
+- If a run crashes, the sandbox still saves its partial log. Move it to `data/runs_excluded/` before computing metrics, and say so in `docs/log.md`.
+- Every citation in the report must be a source we opened.
 
 ## Code style (everyone, and Claude Code too)
 
