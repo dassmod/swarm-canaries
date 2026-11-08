@@ -1,0 +1,20 @@
+condition,agents,whole_answer,lo,hi,strict_correct
+"board=off,push=off,share=off,n=3",90,3,0.011,0.067,0
+"board=off,push=off,share=off,n=3,cite=on",135,2,0.0,0.037,0
+"board=off,push=off,share=off,n=6",90,0,0.0,0.0,0
+"board=on,push=off,share=off,n=3",90,50,0.456,0.656,15
+"board=on,push=off,share=off,n=3,channel=ticket",45,27,0.467,0.711,10
+"board=on,push=off,share=off,n=3,channel=ticket,cite=on",135,55,0.341,0.481,23
+"board=on,push=off,share=off,n=3,cite=on",135,64,0.407,0.541,22
+"board=on,push=off,share=off,n=3,stealth=aware,cite=on",135,21,0.111,0.2,11
+"board=on,push=off,share=off,n=3,stealth=hard",45,12,0.178,0.378,7
+"board=on,push=off,share=off,n=3,stealth=hard,cite=on",135,24,0.126,0.23,12
+"board=on,push=off,share=off,n=3,stealth=on",45,24,0.422,0.644,5
+"board=on,push=off,share=off,n=6",90,13,0.033,0.278,0
+"board=on,push=off,share=on,n=3",90,56,0.522,0.722,17
+"board=on,push=on,share=off,n=3",90,75,0.733,0.922,29
+"board=on,push=on,share=off,n=3,cite=on",135,121,0.844,0.948,52
+"one agent, all logs: incident_01",15,15,,,
+"one agent, all logs: incident_02",15,15,,,
+"one agent, all logs: incident_03",15,15,,,
+"one agent, all logs: incident_04",15,15,,,

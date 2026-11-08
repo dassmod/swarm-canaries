@@ -1,0 +1,7 @@
+condition,reports,any_id,own_id,other_agent_id
+"board=off,push=off,share=off,n=3,cite=on",134,134,134,0
+"board=on,push=off,share=off,n=3,channel=ticket,cite=on",135,135,135,88
+"board=on,push=off,share=off,n=3,cite=on",135,135,135,99
+"board=on,push=off,share=off,n=3,stealth=aware,cite=on",135,135,135,3
+"board=on,push=off,share=off,n=3,stealth=hard,cite=on",135,135,135,15
+"board=on,push=on,share=off,n=3,cite=on",135,135,135,135
