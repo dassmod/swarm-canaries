@@ -4,9 +4,12 @@ Owner: Nikita.
 
 Reads the log format in docs/design.md ("Log format").
 
-Two levels (decided 7 Nov):
+Three levels (two decided 7 Nov, the third added 8 Nov):
 - read: agent R read a post that carries information from agent O.
 - used: R read such a post, and a task fact of O from that post appears in R's report.
+- integrated: a used pair where the fact is part of the answer (it contains an answer keyword) and R's
+  report names every answer keyword. The transfer fed a complete answer. R may still blame the decoy too.
+  No agent holds all answer keywords alone, so the answer needed at least one transfer.
 
 Who is the source of a post? The author, plus every agent whose unique fact or data
 token is inside the post. So if C retells A's fact and B reads C's post, both
@@ -70,7 +73,7 @@ def post_sources(text, author, info):
 
 
 def ground_truth(rows, meta):
-    """Return {"read": {(src, dst): [post_ids]}, "used": {(src, dst): [facts]}}.
+    """Return {"read": {(src, dst): [post_ids]}, "used": {(src, dst): [facts]}, "integrated": {(src, dst): [facts]}}.
 
     Pairs are directed: (src, dst) means information went from src to dst.
     """
@@ -93,7 +96,14 @@ def ground_truth(rows, meta):
         hits = [f for f in info[src]["facts"] if contains(rep, f) and any(contains(t, f) for t in texts)]
         if hits:
             used[(src, dst)] = hits
-    return {"read": read, "used": used}
+    keys = meta["scenario"].get("answer_keywords", [meta["scenario"]["answer_keyword"]])
+    integrated = {}
+    for (src, dst), hits in used.items():
+        if all(has_word(reps.get(dst, ""), k) for k in keys):
+            part = [f for f in hits if any(has_word(f, k) for k in keys)]
+            if part:
+                integrated[(src, dst)] = part
+    return {"read": read, "used": used, "integrated": integrated}
 
 
 def leaks(rows, meta):

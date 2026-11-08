@@ -17,6 +17,7 @@ Two modes:
 Run:
   .venv/bin/python scripts/03_monitor.py                       # all runs in data/runs, blind
   .venv/bin/python scripts/03_monitor.py --mode informed
+  .venv/bin/python scripts/03_monitor.py --mode redacted --workers 5   # 5 calls at the same time
   .venv/bin/python scripts/03_monitor.py --runs tests/fixtures --dry-run   # print one prompt, call no model
 Needs ADAPTION_API_KEY and MONITOR_MODEL in .env (Nikita's key: the monitor runs on his credits).
 
@@ -31,6 +32,7 @@ import json
 import os
 import re
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -43,6 +45,7 @@ ap.add_argument("--runs", default=str(ROOT / "data" / "runs"))
 ap.add_argument("--mode", choices=["blind", "informed", "redacted"], default="blind")
 ap.add_argument("--out", default=None, help="default data/monitor (blind) or data/monitor_<mode>")
 ap.add_argument("--dry-run", action="store_true", help="print the prompt of the first run and stop")
+ap.add_argument("--workers", type=int, default=1, help="calls at the same time (default 1)")
 ap.add_argument("--limit", type=int, default=0, help="only the first N runs (0 = all)")
 args = ap.parse_args()
 
@@ -132,29 +135,40 @@ if args.dry_run:
 
 from src.sandbox import make_client  # noqa: E402  (loads .env; imported late so --dry-run needs no SDK)
 
-client = make_client().with_options(
-    timeout=180, max_retries=3
-)  # long reports: the default timeout was too short (7 Nov)
+client = make_client().with_options(timeout=180, max_retries=3)
 MODEL = os.getenv("MONITOR_MODEL")
 if not MODEL:
     sys.exit("Put MONITOR_MODEL in .env")
 out_dir.mkdir(parents=True, exist_ok=True)
 
-for log_path in logs:
+
+def ask(text):
+    """Call the monitor model and return its answer text.
+
+    Streaming, because the model can think for two minutes on a six-agent run. Without a stream the
+    Adaption gateway closes the silent connection with a 504 (8 Nov). With a stream the timeout is
+    the gap between two events, not the whole answer.
+    """
+    out = []
+    for ev in client.responses.create(model=MODEL, instructions=INSTRUCTIONS, input=text, stream=True):
+        if ev.type == "response.output_text.delta":
+            out.append(ev.delta)
+        elif ev.type in ("response.failed", "error"):
+            raise RuntimeError(f"stream event {ev.type}")
+    return "".join(out)
+
+
+def check(log_path):
+    """Score one run and write its output file. A failed call is reported, not raised."""
     rows, meta = load_run(log_path)
     target = out_dir / f"{meta['run_id']}.json"
     if target.exists():
-        continue
+        return
     try:
-        response = client.responses.create(
-            model=MODEL,
-            instructions=INSTRUCTIONS,
-            input=build_input(meta, reports(rows), args.mode),
-        )
+        raw = ask(build_input(meta, reports(rows), args.mode))
     except Exception as e:  # one failed call must not stop the batch; rerun later to fill the gap
-        print(f"{meta['run_id']}  FAILED: {type(e).__name__}: {str(e)[:200]}  (rerun the script to retry)")
-        continue
-    raw = response.output_text or ""
+        print(f"{meta['run_id']}  FAILED: {type(e).__name__}: {str(e)[:200]}  (rerun the script to retry)", flush=True)
+        return
     flags = parse_flags(raw, meta["agents"])
     target.write_text(
         json.dumps(
@@ -168,4 +182,8 @@ for log_path in logs:
             indent=2,
         )
     )
-    print(f"{meta['run_id']}  [{meta['condition']}]  flags: {[(f['src'], f['dst']) for f in flags]}")
+    print(f"{meta['run_id']}  [{meta['condition']}]  flags: {[(f['src'], f['dst']) for f in flags]}", flush=True)
+
+
+with ThreadPoolExecutor(max_workers=args.workers) as pool:
+    list(pool.map(check, logs))

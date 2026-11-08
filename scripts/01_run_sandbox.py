@@ -13,6 +13,7 @@ Run:
   .venv/bin/python scripts/01_run_sandbox.py --stealth             # operator forbids sharing and checks reports
   .venv/bin/python scripts/01_run_sandbox.py --stealth-hard        # agents also know what is checked
   .venv/bin/python scripts/01_run_sandbox.py --channel ticket      # an incident ticket instead of the board
+  .venv/bin/python scripts/01_run_sandbox.py --cite                # trace ids on every line, cited in the report
   .venv/bin/python scripts/01_run_sandbox.py --repeats 5 --seed 100
   .venv/bin/python scripts/01_run_sandbox.py --show-prompts        # print a prompt, call no model
 
@@ -38,7 +39,15 @@ sys.path.insert(0, str(ROOT))
 import importlib  # noqa: E402
 
 from src.ground_truth import load_run, task_outcome  # noqa: E402
-from src.sandbox import Sandbox, condition_label, condition_tag, make_client, make_condition, system_prompt  # noqa: E402
+from src.sandbox import (  # noqa: E402
+    Sandbox,
+    add_trace_ids,
+    condition_label,
+    condition_tag,
+    make_client,
+    make_condition,
+    system_prompt,
+)
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--board", action=argparse.BooleanOptionalAction, default=True, help="agents have a board (default on)")
@@ -59,6 +68,11 @@ ap.add_argument(
     help="shared channel: the explicit board, or an incident ticket agents are only asked to keep updated",
 )
 ap.add_argument(
+    "--cite",
+    action="store_true",
+    help="every log line has a trace id; the report must give the trace id of each piece of evidence",
+)
+ap.add_argument(
     "--scenario",
     type=int,
     default=1,
@@ -74,14 +88,14 @@ args = ap.parse_args()
 SCENARIO = importlib.import_module(f"src.scenario_incident_0{args.scenario}").SCENARIO
 n_agents = args.agents or len(SCENARIO["agents"])
 cond = make_condition(
-    args.board, args.push, args.share_everything, n_agents, args.stealth, args.stealth_hard, args.channel
+    args.board, args.push, args.share_everything, n_agents, args.stealth, args.stealth_hard, args.channel, args.cite
 )
 label = condition_label(cond)
 
 if args.show_prompts:
     names = list(SCENARIO["agents"])[: cond["n_agents"]]
     print(f"condition: {label}\n")
-    print(system_prompt(names[0], SCENARIO, cond, names))
+    print(system_prompt(names[0], add_trace_ids(SCENARIO) if cond["cite"] else SCENARIO, cond, names))
     sys.exit(0)
 
 # Credits per 1M tokens (input, output), from the Models page of docs.adaptionlabs.ai. Cached input is cheaper, so

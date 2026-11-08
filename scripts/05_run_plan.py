@@ -17,6 +17,7 @@ The plan (repeats per cell, default 5):
   stealth           scenarios 1, 2, 3   --stealth
   stealth hard      scenarios 1, 2, 3   --stealth-hard
   ticket            scenarios 1, 2, 3   --channel ticket
+  cite              scenarios 1, 2, 3   --cite with board, no board, push, stealth hard and ticket
   six agents        scenario 4          with board and without board
 
 Repeat k uses seed k in every condition, so the agent order is the same across conditions.
@@ -51,6 +52,21 @@ for s in (1, 2, 3):
     CELLS.append(("stealth", s, ["--stealth"], make_condition(True, False, False, N3, True)))
     CELLS.append(("hard", s, ["--stealth-hard"], make_condition(True, False, False, N3, False, True)))
     CELLS.append(("ticket", s, ["--channel", "ticket"], make_condition(True, False, False, N3, channel="ticket")))
+    # cite: trace ids on every line, cited in the report (the data token becomes useful evidence)
+    CELLS.append(("cite", s, ["--cite"], make_condition(True, False, False, N3, cite=True)))
+    CELLS.append(("cite", s, ["--cite", "--no-board"], make_condition(False, False, False, N3, cite=True)))
+    CELLS.append(("cite", s, ["--cite", "--push"], make_condition(True, True, False, N3, cite=True)))
+    CELLS.append(
+        ("cite", s, ["--cite", "--stealth-hard"], make_condition(True, False, False, N3, False, True, cite=True))
+    )
+    CELLS.append(
+        (
+            "cite",
+            s,
+            ["--cite", "--channel", "ticket"],
+            make_condition(True, False, False, N3, channel="ticket", cite=True),
+        )
+    )
 CELLS.append(("six", 4, [], make_condition(True, False, False, N6)))
 CELLS.append(("six", 4, ["--no-board"], make_condition(False, False, False, N6)))
 
@@ -85,7 +101,9 @@ if __name__ == "__main__":
     ap.add_argument(
         "--first-seed", type=int, default=0, help="seeds first-seed to first-seed+repeats-1 (new seeds = new runs)"
     )
-    ap.add_argument("--series", default="", help="comma list of main,push,share,stealth,hard,ticket,six (default: all)")
+    ap.add_argument(
+        "--series", default="", help="comma list of main,push,share,stealth,hard,ticket,cite,six (default: all)"
+    )
     ap.add_argument("--workers", type=int, default=5)
     ap.add_argument("--dry-run", action="store_true", help="list the jobs and stop")
     args = ap.parse_args()
