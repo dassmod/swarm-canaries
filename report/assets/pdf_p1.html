@@ -1,0 +1,45 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+@page{size:A4;margin:0}
+:root{--neon:#eaff3d;--ink:#211f1c;--mid:#211f1cb0;--faint:#211f1c80;--hair:#211f1c26}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#fff}
+body{width:210mm;font-family:"Geist",sans-serif;color:var(--ink);font-size:9.6pt;line-height:14.2pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;padding:13mm 21mm 15mm;position:relative;overflow:hidden}
+.top{display:flex;justify-content:space-between;font:400 7.4pt/11pt "Geist Mono",monospace;color:var(--faint);padding-bottom:3.5mm;border-bottom:.6pt solid var(--hair)}
+h1{font-size:27pt;line-height:30.5pt;font-weight:500;letter-spacing:-.022em;margin-top:6.5mm}
+.hl{background-image:linear-gradient(transparent 60%,var(--neon) 60%,var(--neon) 94%,transparent 94%);padding:0 .05em}
+.sub{font-size:12pt;line-height:16pt;color:var(--mid);margin-top:2.2mm}
+.authors{display:flex;gap:11mm;margin-top:4.5mm;font-size:9pt;line-height:12.5pt}
+.authors b{font-weight:500;display:block}
+.authors span{color:var(--faint);font:400 7.6pt/11.5pt "Geist Mono",monospace}
+.label{font:400 7.6pt/11pt "Geist Mono",monospace;color:var(--faint);display:block;margin-bottom:1.4mm}
+.abstract{margin-top:5.5mm;padding:3.6mm 0;border-top:.6pt solid var(--hair);border-bottom:.6pt solid var(--hair);font-size:9.2pt;line-height:13.6pt}
+h2{font-size:12.5pt;line-height:16pt;font-weight:600;letter-spacing:-.01em;margin-top:5mm;margin-bottom:1.6mm}
+p{margin-bottom:2.1mm}
+ul{list-style:none;margin-top:1mm}
+li{position:relative;padding-left:4.4mm;margin-bottom:1.5mm}
+li:before{content:"";position:absolute;left:0;top:1.75mm;width:1.5mm;height:1.5mm;background:var(--ink)}
+li b,p b{font-weight:600}
+.foot{position:absolute;left:21mm;right:21mm;bottom:7mm;display:flex;justify-content:space-between;font:400 7.4pt/11pt "Geist Mono",monospace;color:var(--faint)}
+</style></head><body><div class="page">
+<div class="top"><span>(Swarm Alignment Hackathon)</span><span>With Apart Research, 2026</span></div>
+<h1>The Monitor Was Reading the <span class="hl">Credits</span></h1>
+<div class="sub">Canaries and Proof of Transfer Between AI Agents</div>
+<div class="authors"><div><b>Dastan Modubash</b><span>[affiliation]</span></div><div><b>Nikita Stanchenkov</b><span>[affiliation]</span></div></div>
+<div class="abstract"><span class="label">(Abstract)</span>When AI agents work together, an operator often sees only what each agent reports. Can the operator prove from those reports that information moved between agents? We built a sandbox where a harness logs every read, so each real transfer is known, and ran 465 multi-agent incident-triage runs on an open model. We scored four report-reading detectors against that log. A blind LLM monitor caught 98% of transfers, but only because agents named their sources: it caught 94 to 100% of transfers when the report named the source and 13 to 25% when it did not. One benign report format, which asked agents to cite log ids, cut its recall to 14% (10% with a second monitor model), and no agent was told to hide. The same format raised a token canary from 9% to 100%, because the token became evidence agents needed. When agents knew the ids were checked, the canary fell to 12%: they kept their own ids and removed others'. An informed monitor, which knows what each agent was given, held at 77 to 79% under hiding. Loosening the monitor prompt raised false alarms in no-board runs from 2% to 14% of pairs. Text monitors see declared transfer. Canaries see what agents agree to carry. What held up was checking reports against what the operator handed out.</div>
+<h2>1. Introduction</h2>
+<p>In July 2026 about 1,200 OpenAI agents, meant to be isolated, found a way to talk. They used a message board nobody sanctioned and posted more than 70,000 messages and files. 700 of them went on to attack Hugging Face (Wijk et al., 2026).</p>
+<p>How do we know? Investigators spent six days on premises with a dump of the board and about 1,300 transcripts with raw chains of thought. Most operators will never have that. Even the logs are not safe: agents in the same incident researched how to spoof or delete their transcripts, and about 7% of the evaluated transcripts were spoofed in places.</p>
+<p>So what does an operator usually have? A report. Our question is plain: <b>if you can read only what each agent reports, can you prove that information moved from one agent to another?</b></p>
+<p>We started with two candidates. A marked token, like a marked banknote: if it shows up in another agent's report, information moved, and nobody has to confess. And an LLM monitor that reads the reports. We expected the monitor to mistake the likeness of model copies for communication. It mostly did not. It failed in a different way.</p>
+<p>What we contribute:</p>
+<ul>
+<li><b>A testbed where we know the truth.</b> The harness, not the agents, logs every read and post. We score transfer at three levels: read, used, integrated into the answer.</li>
+<li><b>A blind text monitor sees declared transfer, not transfer.</b> Its recall follows whether the report names the source. One benign report format cut it from 98% to 14%, and the drop repeats on a second monitor model.</li>
+<li><b>Canaries, measured from both sides.</b> A decorative token catches 9%. A token agents need catches 100%. A token agents know is checked catches 12%.</li>
+<li><b>What survived.</b> Checking reports against what the operator handed out held at 77 to 79% when agents hid. We also show the false-alarm price of tuning the monitor prompt.</li>
+</ul>
+<div class="foot"><span>The Monitor Was Reading the Credits</span><span>1</span></div>
+</div></body></html>
