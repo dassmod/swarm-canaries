@@ -1,7 +1,7 @@
 # The Monitor Was Reading the Credits: Canaries and Proof of Transfer Between AI Agents
 
-Dastan Modubash, Newo.ai, Bishkek, Kyrgyzstan
-Nikita Stanchenkov, Newo.ai, Asunción, Paraguay
+Dastan Modubash, Independent, Bishkek, Kyrgyzstan
+Nikita Stanchenkov, Independent, Asunción, Paraguay
 With Apart Research
 
 ## Abstract
