@@ -68,4 +68,4 @@ Optional talk: Justin Shenk, "Modeling Agent Swarms: A Field Guide", Saturday 19
 
 - No number in the report without a script in `scripts/` that produces it.
 - Generate with AI, then rewrite in our own words; judges may skip AI-slop reports.
-- Repo stays private.
+- Repo is public. Never commit `.env` or anything in `data/`.

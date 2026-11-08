@@ -6,7 +6,7 @@ Research code for Apart Research's Swarm Alignment Hackathon: canary tokens as p
 
 - Only weekend work is judged. Anything written before 7 Nov 2026 is marked as pre-existing in the README.
 - No fabricated numbers. Every figure in the report comes from a script in `scripts/` that can be re-run.
-- The repo stays private. Never commit `.env` or anything in `data/`.
+- The repo is public. Never commit `.env` or anything in `data/`.
 - Agents in the sandbox can only call the functions we give them. No internet, no shell, no file access for agents.
 - Log every board read and post as one JSONL row. The log is the ground truth.
 - Record decisions and findings in `docs/log.md`, newest first.

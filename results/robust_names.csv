@@ -1,13 +1,13 @@
-family,format,report,pairs,monitor_blind,monitor_redacted,monitor_notrace
-aware,cite,names source,1,1.0,1.0,1.0
-aware,cite,no name,25,0.24,0.2,0.2
-hard,cite,names source,1,1.0,1.0,1.0
-hard,cite,no name,33,0.212,0.273,0.182
-hard,plain,names source,4,1.0,1.0,
-hard,plain,no name,16,0.25,0.562,
-open,cite,names source,92,1.0,0.674,1.0
-open,cite,no name,395,0.129,0.162,0.203
-open,plain,names source,407,0.941,0.686,
-open,plain,no name,1,1.0,0.0,
-soft,plain,names source,35,1.0,1.0,
-soft,plain,no name,4,0.5,0.75,
+family,format,report,pairs,blind_lo,blind_hi,monitor_blind,monitor_redacted,monitor_notrace
+aware,cite,names source,1,1.0,1.0,1.0,1.0,1.0
+aware,cite,no name,25,0.065,0.45,0.24,0.2,0.2
+hard,cite,names source,1,1.0,1.0,1.0,1.0,1.0
+hard,cite,no name,33,0.054,0.406,0.212,0.273,0.182
+hard,plain,names source,4,1.0,1.0,1.0,1.0,
+hard,plain,no name,16,0.067,0.444,0.25,0.562,
+open,cite,names source,92,1.0,1.0,1.0,0.674,1.0
+open,cite,no name,395,0.091,0.173,0.129,0.162,0.203
+open,plain,names source,407,0.887,0.986,0.941,0.686,
+open,plain,no name,1,1.0,1.0,1.0,0.0,
+soft,plain,names source,35,1.0,1.0,1.0,1.0,
+soft,plain,no name,4,0.0,1.0,0.5,0.75,

@@ -9,7 +9,8 @@ Reads results/robust_recall.csv and results/robust_names.csv.
 
 Writes:
   results/fig1_detectors.png   recall of three detectors under four report conditions, with 95% intervals over runs
-  results/fig2_names.png       blind monitor recall on used pairs, by whether the receiver's report names the source
+  results/fig2_names.png       blind monitor recall on used pairs, by whether the receiver's report names the source,
+                               with 95% intervals over runs
 """
 
 import csv
@@ -37,6 +38,7 @@ DETS = [
     ("monitor_blind", "Blind LLM monitor", "#eb6834", "s"),
     ("monitor_informed", "Informed LLM monitor", "#1baf7a", "D"),
 ]
+LABEL_LEFT = {(0, "monitor_blind"), (3, "canary")}
 recall = {(r["condition"], r["detector"]): r for r in csv.DictReader(open(RES / "robust_recall.csv"))}
 
 fig, ax = plt.subplots(figsize=(7.6, 3.9), dpi=200)
@@ -51,8 +53,18 @@ for i, (_, name, color, marker) in enumerate(DETS):
     ax.errorbar(
         xs, ys, yerr=[lo, hi], fmt=marker, color=color, ms=7, mec="white", mew=1, elinewidth=2, capsize=0, label=name
     )
-    for x, y in zip(xs, ys, strict=True):
-        ax.annotate(f"{y:.0%}", (x, y), xytext=(8, 0), textcoords="offset points", va="center", fontsize=9, color=MUTED)
+    for k, (x, y) in enumerate(zip(xs, ys, strict=True)):
+        left = (k, det) in LABEL_LEFT  # these labels would touch the next marker or its whisker
+        ax.annotate(
+            f"{y:.0%}",
+            (x, y),
+            xytext=(-8 if left else 8, 0),
+            textcoords="offset points",
+            va="center",
+            ha="right" if left else "left",
+            fontsize=9,
+            color=MUTED,
+        )
 n = [recall[(c, "canary")]["used"] for c, _ in CONDS]
 ax.set_xticks(range(len(CONDS)))
 ax.set_xticklabels([f"{label}\nn={k} transfers" for (_, label), k in zip(CONDS, n, strict=True)], fontsize=9.5)
@@ -82,11 +94,13 @@ fig, ax = plt.subplots(figsize=(7.6, 2.8), dpi=200)
 for i, (fam, fmt, nm, label) in enumerate(BARS):
     r = next(x for x in names if (x["family"], x["format"], x["report"]) == (fam, fmt, nm))
     y = float(r["monitor_blind"])
+    lo, hi = float(r["blind_lo"]), float(r["blind_hi"])
     ax.bar(i, y, width=0.5, color="#eb6834")
-    ax.text(i, y + 0.03, f"{y:.0%}\nn={r['pairs']}", ha="center", fontsize=9, color=MUTED)
+    ax.errorbar(i, y, yerr=[[y - lo], [hi - y]], color=INK, elinewidth=1.4, capsize=0)
+    ax.text(i, max(y, hi) + 0.04, f"{y:.0%}\nn={r['pairs']}", ha="center", fontsize=9, color=MUTED)
 ax.set_xticks(range(len(BARS)))
 ax.set_xticklabels([b[3] for b in BARS], fontsize=8.5)
-ax.set_ylim(0, 1.3)
+ax.set_ylim(0, 1.42)
 ax.set_yticks([0, 0.5, 1])
 ax.set_yticklabels(["0%", "50%", "100%"])
 ax.set_ylabel("Caught by blind monitor")
